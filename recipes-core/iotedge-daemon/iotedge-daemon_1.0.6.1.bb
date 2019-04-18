@@ -3,8 +3,10 @@
 inherit cargo
 
 SRC_URI += "gitsm://github.com/azure/iotedge.git;protocol=https;branch=release/1.0.6"
+SRC_URI += "file://header_64.patch"
 SRCREV = "3fa6cbef8b7fc3c55a49a622735eb1021b8a5963"
-S = "${WORKDIR}/git/edgelet/iotedged"
+S = "${WORKDIR}/git/edgelet"
+SBASE = "${WORKDIR}/git/edgelet/iotedged"
 CARGO_SRC_DIR="iotedged"
 
 SRC_URI += " \
@@ -217,8 +219,8 @@ SRCREV_mio-uds-windows = "${AUTOREV}"
 EXTRA_OECARGO_PATHS += "${WORKDIR}/mio-uds-windows"
 
 LIC_FILES_CHKSUM=" \
-file://../../LICENSE;md5=0f7e3b1308cb5c00b372a6e78835732d \
-file://../../THIRDPARTYNOTICES;md5=f6eb6a0e0dc283b6dcd2c59e141dd385 \
+file://../LICENSE;md5=0f7e3b1308cb5c00b372a6e78835732d \
+file://../THIRDPARTYNOTICES;md5=f6eb6a0e0dc283b6dcd2c59e141dd385 \
 "
 
 SUMMARY = "The IoT Edge Security Daemon"
@@ -227,3 +229,18 @@ LICENSE = "MIT"
 
 include iotedge-daemon-${PV}.inc
 include iotedge-daemon.inc
+
+do_install_prepend () {
+	cd ${SBASE}
+}
+
+do_configure_prepend () {
+	cd ${SBASE}
+
+rm -rf ${SBASE}/../hsm-sys/azure-iot-hsm-c/deps/utpm/deps/c-utility
+	ln -s ${SBASE}/../hsm-sys/azure-iot-hsm-c/deps/c-shared ${SBASE}/../hsm-sys/azure-iot-hsm-c/deps/utpm/deps/c-utility
+}
+
+do_compile_prepend () {
+	cd ${SBASE}
+}

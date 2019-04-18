@@ -16,3 +16,11 @@ RPROVIDES_${PN} += "virtual/libiothsm"
 
 EXTRA_OECMAKE += "-DBUILD_SHARED=On -Duse_emulator=Off -Duse_http=Off -Duse_default_uuid=On -DCMAKE_SYSTEM_VERSION=10"
 inherit cmake
+inherit useradd
+USERADD_PACKAGES = "${PN}"
+GROUPADD_PARAM_${PN} = "-r docker"
+
+do_configure_prepend () {
+	rm -rf ${S}/deps/utpm/deps/c-utility
+	ln -s ${S}/deps/c-shared ${S}/deps/utpm/deps/c-utility
+}
